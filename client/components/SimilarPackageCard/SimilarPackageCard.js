@@ -126,7 +126,9 @@ export default class SimilarPackageCard extends Component {
             <p
               className="similar-package-card__description"
               dangerouslySetInnerHTML={{
-                __html: DOMPurify.sanitize(pack.description),
+                __html: DOMPurify.sanitize(pack.description, {
+                  ALLOWED_TAGS: [],
+                }),
               }}
             />
           </div>

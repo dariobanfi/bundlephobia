@@ -26,13 +26,16 @@ class QuickStatsBar extends Component {
   getTrimmedDescription = () => {
     let trimmed
     const { description } = this.props
-    if (description.trim().endsWith('.')) {
-      trimmed = description.substring(0, description.length - 1)
+    const purifiedDescription = DOMPurify.sanitize(description, {
+      ALLOWED_TAGS: [],
+    })
+    if (purifiedDescription.trim().endsWith('.')) {
+      trimmed = purifiedDescription.substring(0, description.length - 1)
     } else {
-      trimmed = description.trim()
+      trimmed = purifiedDescription.trim()
     }
 
-    return DOMPurify.sanitize(trimmed)
+    return trimmed
   }
 
   render() {
@@ -44,24 +47,29 @@ class QuickStatsBar extends Component {
       repository,
     } = this.props
     const statItemCount = this.getStatItemCount()
+    const trimmedDescription = this.getTrimmedDescription()
 
     return (
       <div className="quick-stats-bar">
-        <div
-          className="quick-stats-bar__stat quick-stats-bar__stat--description "
-          title={this.getTrimmedDescription()}
-        >
-          <InfoIcon />
-          {statItemCount < 2 && (
-            <span
-              className="quick-stats-bar__stat--description-content"
-              dangerouslySetInnerHTML={{ __html: this.getTrimmedDescription() }}
-              style={{
-                maxWidth: `${500 - statItemCount * 280}px`,
-              }}
-            />
-          )}
-        </div>
+        {trimmedDescription && (
+          <div
+            className="quick-stats-bar__stat quick-stats-bar__stat--description "
+            title={this.getTrimmedDescription()}
+          >
+            <InfoIcon />
+            {statItemCount < 2 && (
+              <span
+                className="quick-stats-bar__stat--description-content"
+                dangerouslySetInnerHTML={{
+                  __html: this.getTrimmedDescription(),
+                }}
+                style={{
+                  maxWidth: `${500 - statItemCount * 280}px`,
+                }}
+              />
+            )}
+          </div>
+        )}
 
         {isTreeShakeable && (
           <div className="quick-stats-bar__stat">
